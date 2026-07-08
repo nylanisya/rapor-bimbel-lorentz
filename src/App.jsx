@@ -18,12 +18,20 @@ function useResponsiveScale() {
     };
     calc();
     window.addEventListener("resize", calc);
-    return () => window.removeEventListener("resize", calc);
+
+    const before = () => setScale(1);
+    window.addEventListener("beforeprint", before);
+    window.addEventListener("afterprint", calc);
+
+    return () => {
+      window.removeEventListener("resize", calc);
+      window.removeEventListener("beforeprint", before);
+      window.removeEventListener("afterprint", calc);
+    };
   }, []);
 
   return scale;
 }
-
 // ============ FUNGSI DEFAULT ============
 const defaultSubjects = () => [
   { mapel: "Matematika", nilai: "" },
@@ -716,7 +724,7 @@ function AttendanceLine({ label, value, onChange }) {
 }
 
 // ============ STYLES ============
-const FONT = "'Times New Roman', Times, serif";
+const FONT = "'Tinos', 'Times New Roman', Times, serif";
 
 const styles = {
   pageWrapper: {

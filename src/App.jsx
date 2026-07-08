@@ -959,13 +959,13 @@ const styles = {
     fontSize: "19px",
     fontWeight: 700,
     letterSpacing: "1px",
-    margin: "10px 0 18px",
+    margin: "8px 0 14px",
   },
   table: {
     width: "100%",
     borderCollapse: "collapse",
     fontSize: "13.5px",
-    marginBottom: "22px",
+    marginBottom: "16px",
   },
   th: {
     border: "1px solid #1a1a1a",
@@ -1007,7 +1007,7 @@ const styles = {
   },
   midSection: {
     display: "flex",
-    marginBottom: "18px",
+    marginBottom: "12px",
   },
   attendanceBlock: {
     width: "48%",
@@ -1096,7 +1096,7 @@ const styles = {
   signRow: {
     display: "flex",
     justifyContent: "space-between",
-    marginTop: "26px",
+    marginTop: "16px",
     fontSize: "13.5px",
     width: "100%",
   },
@@ -1125,7 +1125,7 @@ const styles = {
     marginTop: "0px",
   },
   signSpace: {
-    height: "50px",
+    height: "36px",
     flexShrink: 0,
     width: "100%",
   },
@@ -1181,7 +1181,7 @@ const printStyles = `
       margin: 0 !important;
       width: 210mm !important;
       min-height: 297mm !important;
-      padding: 15mm 18mm !important;
+     padding: 11mm 16mm !important;  
       box-sizing: border-box !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;

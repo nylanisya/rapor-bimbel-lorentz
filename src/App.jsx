@@ -578,111 +578,20 @@ function PaperPage({
 }
 
 // ============ WATERMARK: "Instituut Lorentz" ============
-function Watermark() {
+function Watermark({ src = "/logo-bimbel.png" }) {
   return (
     <div style={styles.watermarkWrapper} aria-hidden="true">
-      <svg
-        viewBox="0 0 800 440"
-        style={styles.watermarkSvg}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* INSTITUUT */}
-        <text
-          x="390"
-          y="100"
-          textAnchor="middle"
-          fontFamily="Georgia, 'Times New Roman', serif"
-          fontWeight="700"
-          fontSize="52"
-          letterSpacing="19"
-          fill="#E07B29"
-        >
-          INSTITUUT
-        </text>
-
-        {/* LORENTZ wordmark */}
-        <g>
-          {/* clock-hand shaped L: tapered needle for the vertical stroke */}
-          <path
-            d="M 133 300 L 160 300 L 152 160 Q 148 148 144 160 Z"
-            fill="#E07B29"
-          />
-          {/* horizontal foot of the L */}
-          <path d="M 133 300 L 245 300 L 245 272 L 160 272 Z" fill="#E07B29" />
-          {/* small clock face sitting at the foot/corner of the L */}
-          <circle
-            cx="148"
-            cy="288"
-            r="25"
-            fill="#F6B93B"
-            stroke="#B9791A"
-            strokeWidth="4"
-          />
-          <line
-            x1="148"
-            y1="266"
-            x2="148"
-            y2="271"
-            stroke="#8a5a10"
-            strokeWidth="2"
-          />
-          <line
-            x1="148"
-            y1="305"
-            x2="148"
-            y2="310"
-            stroke="#8a5a10"
-            strokeWidth="2"
-          />
-          <line
-            x1="126"
-            y1="288"
-            x2="131"
-            y2="288"
-            stroke="#8a5a10"
-            strokeWidth="2"
-          />
-          <line
-            x1="165"
-            y1="288"
-            x2="170"
-            y2="288"
-            stroke="#8a5a10"
-            strokeWidth="2"
-          />
-          <line
-            x1="148"
-            y1="288"
-            x2="148"
-            y2="274"
-            stroke="#7a4a10"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-          <line
-            x1="148"
-            y1="288"
-            x2="159"
-            y2="288"
-            stroke="#7a4a10"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-          <circle cx="148" cy="288" r="2.5" fill="#7a4a10" />
-
-          {/* rest of the word: orentz */}
-          <text
-            x="252"
-            y="300"
-            fontFamily="Georgia, 'Times New Roman', serif"
-            fontWeight="700"
-            fontSize="150"
-            fill="#E07B29"
-          >
-            orentz
-          </text>
-        </g>
-      </svg>
+      <img
+        src={src}
+        alt="Watermark Bimbel Lorentz"
+        style={{
+          width: "100%",
+          height: "auto",
+          display: "block",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      />
     </div>
   );
 }
@@ -895,8 +804,8 @@ const styles = {
   },
   watermarkWrapper: {
     position: "absolute",
-    top: "50%",
-    left: "50%",
+    top: "40%",
+    left: "60%",
     transform: "translate(-50%, -50%)",
     width: "78%",
     zIndex: 0,

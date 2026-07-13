@@ -56,6 +56,7 @@ const createEmptyPage = () => ({
   namaTutor: "",
   namaOrtu: "",
   namaOwner: "Laurentia Dwi Prantanti",
+  peringkat: "", // <-- field baru
 });
 
 // ============ FUNGSI LOCALSTORAGE ============
@@ -377,6 +378,9 @@ function PaperPage({
     autoResizeNote(noteRef.current);
   }, [page.catatan]);
 
+  // Ambil nilai peringkat, beri default kosong jika belum ada
+  const peringkat = page.peringkat || "";
+
   return (
     <div style={styles.paper} className="paper">
       <Watermark />
@@ -474,10 +478,10 @@ function PaperPage({
           </tbody>
         </table>
 
-        {/* KETIDAKHADIRAN */}
-        <div style={styles.blockLabel}>Ketidakhadiran</div>
+        {/* KETIDAKHADIRAN & PERINGKAT (sejajar) */}
         <div style={styles.midSection}>
           <div style={styles.attendanceBlock}>
+            <div style={styles.blockLabel}>Ketidakhadiran</div>
             <div style={styles.attendanceBox}>
               <AttendanceLine
                 label="Sakit"
@@ -493,6 +497,21 @@ function PaperPage({
                 label="Tanpa Keterangan"
                 value={page.alpa}
                 onChange={set("alpa")}
+              />
+            </div>
+          </div>
+
+          {/* Peringkat - seperti baris teks dengan garis bawah */}
+          <div style={styles.peringkatBlock}>
+            <div style={styles.blockLabel}>Peringkat</div>
+            <div style={styles.peringkatLine}>
+              <span style={styles.peringkatLabel}>Peringkat</span>
+              <span style={styles.peringkatColon}>:</span>
+              <input
+                value={peringkat}
+                onChange={(e) => set("peringkat")(e.target.value)}
+                placeholder="—"
+                style={styles.peringkatInput}
               />
             </div>
           </div>
@@ -917,6 +936,7 @@ const styles = {
   midSection: {
     display: "flex",
     marginBottom: "12px",
+    gap: "20px",
   },
   attendanceBlock: {
     width: "48%",
@@ -965,6 +985,48 @@ const styles = {
   attendanceUnit: {
     flexShrink: 0,
   },
+
+  // ===== PERINGKAT (seperti baris teks) =====
+  peringkatBlock: {
+    width: "48%",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+  },
+  peringkatLine: {
+    display: "flex",
+    alignItems: "baseline",
+    fontSize: "13.5px",
+    textAlign: "left",
+    width: "100%",
+    border: "1px solid #1a1a1a", // tambahkan border kotak agar sejajar dengan attendanceBox
+    padding: "10px 12px",
+    boxSizing: "border-box",
+    minHeight: "80px", // sejajar
+    flex: 1,
+  },
+  peringkatLabel: {
+    minWidth: "80px", // sesuai
+    textAlign: "left",
+    flexShrink: 0,
+    whiteSpace: "nowrap",
+  },
+  peringkatColon: {
+    marginRight: "6px",
+  },
+  peringkatInput: {
+    width: "100%",
+    border: "none",
+    borderBottom: "1px dotted #999",
+    outline: "none",
+    fontSize: "13.5px",
+    padding: "4px 2px",
+    background: "transparent",
+    fontFamily: FONT,
+    textAlign: "center",
+    flex: 1,
+  },
+
   noteBlock: {
     marginBottom: "10px",
   },
@@ -1090,7 +1152,7 @@ const printStyles = `
       margin: 0 !important;
       width: 210mm !important;
       min-height: 297mm !important;
-     padding: 11mm 16mm !important;  
+      padding: 11mm 16mm !important;  
       box-sizing: border-box !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;

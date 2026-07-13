@@ -1,14 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 
-const A4_WIDTH_PX = 793.7; // 210mm at 96dpi
-const A4_HEIGHT_PX = 1122.5; // 297mm at 96dpi
+const A4_WIDTH_PX = 793.7;
+const A4_HEIGHT_PX = 1122.5;
 
-// Menghitung skala agar kertas A4 tetap utuh proporsinya di layar sempit (HP),
-// bukan reflow/wrap seperti elemen web biasa — seluruh kertas diperkecil
-// sebagai satu kesatuan (seperti memperkecil foto), bukan diubah tata letaknya.
 function useResponsiveScale() {
   const [scale, setScale] = useState(1);
-
   useEffect(() => {
     const calc = () => {
       const sidePadding = 16;
@@ -18,21 +14,18 @@ function useResponsiveScale() {
     };
     calc();
     window.addEventListener("resize", calc);
-
     const before = () => setScale(1);
     window.addEventListener("beforeprint", before);
     window.addEventListener("afterprint", calc);
-
     return () => {
       window.removeEventListener("resize", calc);
       window.removeEventListener("beforeprint", before);
       window.removeEventListener("afterprint", calc);
     };
   }, []);
-
   return scale;
 }
-// ============ FUNGSI DEFAULT ============
+
 const defaultSubjects = () => [
   { mapel: "Matematika", nilai: "" },
   { mapel: "Bahasa Indonesia", nilai: "" },
@@ -56,10 +49,9 @@ const createEmptyPage = () => ({
   namaTutor: "",
   namaOrtu: "",
   namaOwner: "Laurentia Dwi Prantanti",
-  peringkat: "", // <-- field baru
+  peringkat: "",
 });
 
-// ============ FUNGSI LOCALSTORAGE ============
 const saveToLocalStorage = (pages) => {
   try {
     localStorage.setItem("raporData", JSON.stringify(pages));
@@ -71,22 +63,18 @@ const saveToLocalStorage = (pages) => {
 const loadFromLocalStorage = () => {
   try {
     const saved = localStorage.getItem("raporData");
-    if (saved) {
-      return JSON.parse(saved);
-    }
+    if (saved) return JSON.parse(saved);
   } catch (error) {
     console.error("Gagal baca:", error);
   }
   return null;
 };
 
-// ============ KOMPONEN UTAMA ============
 export default function RaporBimbelLorentz() {
   const [pages, setPages] = useState(() => {
     const saved = loadFromLocalStorage();
     return saved && saved.length > 0 ? saved : [createEmptyPage()];
   });
-
   const [activePage, setActivePage] = useState(0);
   const [saveStatus, setSaveStatus] = useState("");
   const [showMore, setShowMore] = useState(false);
@@ -95,15 +83,11 @@ export default function RaporBimbelLorentz() {
   useEffect(() => {
     if (pages.length === 0) return;
     saveToLocalStorage(pages);
-    const showTimer = setTimeout(() => setSaveStatus("Tersimpan"), 0);
-    const hideTimer = setTimeout(() => setSaveStatus(""), 2000);
-    return () => {
-      clearTimeout(showTimer);
-      clearTimeout(hideTimer);
-    };
+    setSaveStatus("Tersimpan");
+    const timer = setTimeout(() => setSaveStatus(""), 2000);
+    return () => clearTimeout(timer);
   }, [pages]);
 
-  // ============ FUNGSI CRUD ============
   const updateField = (field, value) => {
     setPages((prev) =>
       prev.map((p, i) => (i === activePage ? { ...p, [field]: value } : p))
@@ -164,11 +148,7 @@ export default function RaporBimbelLorentz() {
   };
 
   const resetData = () => {
-    if (
-      window.confirm(
-        "Yakin ingin menghapus semua data rapor? Tindakan ini tidak bisa dibatalkan."
-      )
-    ) {
+    if (window.confirm("Yakin ingin menghapus semua data rapor?")) {
       localStorage.removeItem("raporData");
       setPages([createEmptyPage()]);
       setActivePage(0);
@@ -193,7 +173,6 @@ export default function RaporBimbelLorentz() {
   const importData = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -221,15 +200,12 @@ export default function RaporBimbelLorentz() {
     <div className="page-wrapper-root" style={styles.pageWrapper}>
       <style>{printStyles}</style>
 
-      {/* ===== TOOLBAR ===== */}
       <div className="no-print" style={styles.toolbarContainer}>
-        {/* Baris 1: Judul + status + tombol utama (Cetak) */}
         <div className="toolbar-header" style={styles.toolbarHeader}>
           <div>
             <div style={styles.toolbarTitle}>Rapor Bimbel Lorentz</div>
             <div style={styles.toolbarSubtitle}>
-              {saveStatus ? saveStatus : "Tersimpan otomatis"} · {pages.length}{" "}
-              siswa
+              {saveStatus || "Tersimpan otomatis"} · {pages.length} siswa
             </div>
           </div>
           <button
@@ -241,7 +217,6 @@ export default function RaporBimbelLorentz() {
           </button>
         </div>
 
-        {/* Baris 2: Tab per siswa */}
         <div style={styles.tabSection}>
           <div style={styles.tabWrapper}>
             {pages.map((p, idx) => (
@@ -262,7 +237,6 @@ export default function RaporBimbelLorentz() {
           </button>
         </div>
 
-        {/* Baris 3: Aksi cepat untuk halaman aktif + menu lainnya */}
         <div className="quick-actions" style={styles.quickActions}>
           <button onClick={duplicatePage} style={styles.btnGhost}>
             Duplikat Siswa Ini
@@ -282,7 +256,6 @@ export default function RaporBimbelLorentz() {
           <button onClick={addSubject} style={styles.btnGhost}>
             + Mata Pelajaran
           </button>
-
           <div className="more-wrapper" style={styles.moreWrapper}>
             <button
               onClick={() => setShowMore((v) => !v)}
@@ -317,7 +290,6 @@ export default function RaporBimbelLorentz() {
         </div>
       </div>
 
-      {/* PAPER PAGES */}
       {pages.map((p, idx) => (
         <div
           key={idx}
@@ -354,7 +326,6 @@ export default function RaporBimbelLorentz() {
   );
 }
 
-// ============ KOMPONEN PAPER ============
 function PaperPage({
   page,
   isActive,
@@ -367,25 +338,21 @@ function PaperPage({
   };
 
   const noteRef = useRef(null);
-
   const autoResizeNote = (el) => {
     if (!el) return;
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
   };
-
   useEffect(() => {
     autoResizeNote(noteRef.current);
   }, [page.catatan]);
 
-  // Ambil nilai peringkat, beri default kosong jika belum ada
   const peringkat = page.peringkat || "";
 
   return (
     <div style={styles.paper} className="paper">
       <Watermark />
       <div style={styles.paperContent}>
-        {/* HEADER */}
         <div style={styles.headerRow}>
           <div style={styles.headerLeft}>
             <FieldLine
@@ -427,10 +394,8 @@ function PaperPage({
         </div>
 
         <div style={styles.divider} />
-
         <h1 style={styles.title}>LAPORAN HASIL BELAJAR</h1>
 
-        {/* TABLE */}
         <table style={styles.table}>
           <thead>
             <tr>
@@ -478,7 +443,6 @@ function PaperPage({
           </tbody>
         </table>
 
-        {/* KETIDAKHADIRAN & PERINGKAT (sejajar) */}
         <div style={styles.midSection}>
           <div style={styles.attendanceBlock}>
             <div style={styles.blockLabel}>Ketidakhadiran</div>
@@ -501,7 +465,6 @@ function PaperPage({
             </div>
           </div>
 
-          {/* Peringkat - seperti baris teks dengan garis bawah */}
           <div style={styles.peringkatBlock}>
             <div style={styles.blockLabel}>Peringkat</div>
             <div style={styles.peringkatLine}>
@@ -532,7 +495,6 @@ function PaperPage({
           />
         </div>
 
-        {/* TANGGAL */}
         <div style={styles.dateRow}>
           <div style={styles.dateLine}>
             <input
@@ -551,7 +513,6 @@ function PaperPage({
           </div>
         </div>
 
-        {/* TANDA TANGAN */}
         <div style={styles.signRow}>
           <div style={styles.signCol}>
             <div style={styles.signHeaderBlock}>
@@ -596,7 +557,6 @@ function PaperPage({
   );
 }
 
-// ============ WATERMARK: "Instituut Lorentz" ============
 function Watermark({ src = "/logo-bimbel.png" }) {
   return (
     <div style={styles.watermarkWrapper} aria-hidden="true">
@@ -615,7 +575,6 @@ function Watermark({ src = "/logo-bimbel.png" }) {
   );
 }
 
-// ============ KOMPONEN PEMBANTU ============
 function FieldLine({ label, value, onChange, placeholder, boldLabel }) {
   return (
     <div style={styles.staticLine}>
@@ -651,7 +610,6 @@ function AttendanceLine({ label, value, onChange }) {
   );
 }
 
-// ============ STYLES ============
 const FONT = "'Tinos', 'Times New Roman', Times, serif";
 
 const styles = {
@@ -664,8 +622,6 @@ const styles = {
     alignItems: "center",
     fontFamily: FONT,
   },
-
-  // ===== TOOLBAR =====
   toolbarContainer: {
     width: "210mm",
     maxWidth: "94vw",
@@ -684,16 +640,8 @@ const styles = {
     marginBottom: "16px",
     gap: "12px",
   },
-  toolbarTitle: {
-    fontSize: "16px",
-    fontWeight: 700,
-    color: "#1a1a1a",
-  },
-  toolbarSubtitle: {
-    fontSize: "12.5px",
-    color: "#5f6368",
-    marginTop: "2px",
-  },
+  toolbarTitle: { fontSize: "16px", fontWeight: 700, color: "#1a1a1a" },
+  toolbarSubtitle: { fontSize: "12.5px", color: "#5f6368", marginTop: "2px" },
   btnPrint: {
     background: "#1f4e3d",
     color: "#ffffff",
@@ -706,7 +654,6 @@ const styles = {
     whiteSpace: "nowrap",
     flexShrink: 0,
   },
-
   tabSection: {
     display: "flex",
     alignItems: "center",
@@ -751,7 +698,6 @@ const styles = {
     whiteSpace: "nowrap",
     flexShrink: 0,
   },
-
   quickActions: {
     display: "flex",
     alignItems: "center",
@@ -768,10 +714,7 @@ const styles = {
     cursor: "pointer",
     whiteSpace: "nowrap",
   },
-  moreWrapper: {
-    position: "relative",
-    marginLeft: "auto",
-  },
+  moreWrapper: { position: "relative", marginLeft: "auto" },
   moreMenu: {
     position: "absolute",
     top: "calc(100% + 6px)",
@@ -798,13 +741,8 @@ const styles = {
     width: "100%",
     boxSizing: "border-box",
   },
-  moreMenuDivider: {
-    height: "1px",
-    background: "#eee",
-    margin: "4px 0",
-  },
+  moreMenuDivider: { height: "1px", background: "#eee", margin: "4px 0" },
 
-  // ===== PAPER STYLES =====
   paper: {
     background: "#ffffff",
     width: "210mm",
@@ -817,10 +755,7 @@ const styles = {
     position: "relative",
     overflow: "hidden",
   },
-  paperContent: {
-    position: "relative",
-    zIndex: 1,
-  },
+  paperContent: { position: "relative", zIndex: 1 },
   watermarkWrapper: {
     position: "absolute",
     top: "40%",
@@ -831,11 +766,6 @@ const styles = {
     pointerEvents: "none",
     opacity: 0.14,
   },
-  watermarkSvg: {
-    width: "100%",
-    height: "auto",
-    display: "block",
-  },
   headerRow: {
     display: "flex",
     justifyContent: "space-between",
@@ -843,10 +773,7 @@ const styles = {
     fontSize: "13px",
     lineHeight: 1.45,
   },
-  headerLeft: {
-    flex: 1.3,
-    textAlign: "left",
-  },
+  headerLeft: { flex: 1.3, textAlign: "left" },
   headerRight: {
     flex: 1,
     display: "flex",
@@ -861,11 +788,7 @@ const styles = {
     width: "100%",
     textAlign: "left",
   },
-  staticLabel: {
-    minWidth: "112px",
-    fontWeight: 600,
-    whiteSpace: "nowrap",
-  },
+  staticLabel: { minWidth: "112px", fontWeight: 600, whiteSpace: "nowrap" },
   inlineInput: {
     border: "none",
     borderBottom: "1px dotted #999",
@@ -905,10 +828,7 @@ const styles = {
   thNo: { width: "42px", textAlign: "center" },
   thNilai: { width: "120px", textAlign: "center" },
   thAction: { width: "30px", border: "none" },
-  td: {
-    border: "1px solid #1a1a1a",
-    padding: "4px 8px",
-  },
+  td: { border: "1px solid #1a1a1a", padding: "4px 8px" },
   tdNo: { textAlign: "center" },
   tdNilai: { textAlign: "center" },
   tdAction: { border: "none", textAlign: "center" },
@@ -938,9 +858,7 @@ const styles = {
     marginBottom: "12px",
     gap: "20px",
   },
-  attendanceBlock: {
-    width: "48%",
-  },
+  attendanceBlock: { width: "48%" },
   blockLabel: {
     fontWeight: 700,
     fontSize: "13.5px",
@@ -968,9 +886,7 @@ const styles = {
     flexShrink: 0,
     whiteSpace: "nowrap",
   },
-  attendanceColon: {
-    marginRight: "6px",
-  },
+  attendanceColon: { marginRight: "6px" },
   attendanceInput: {
     width: "45px",
     border: "none",
@@ -982,11 +898,8 @@ const styles = {
     fontFamily: FONT,
     marginRight: "6px",
   },
-  attendanceUnit: {
-    flexShrink: 0,
-  },
+  attendanceUnit: { flexShrink: 0 },
 
-  // ===== PERINGKAT (seperti baris teks) =====
   peringkatBlock: {
     width: "48%",
     boxSizing: "border-box",
@@ -999,21 +912,19 @@ const styles = {
     fontSize: "13.5px",
     textAlign: "left",
     width: "100%",
-    border: "1px solid #1a1a1a", // tambahkan border kotak agar sejajar dengan attendanceBox
+    border: "1px solid #1a1a1a",
     padding: "10px 12px",
     boxSizing: "border-box",
-    minHeight: "80px", // sejajar
+    minHeight: "80px",
     flex: 1,
   },
   peringkatLabel: {
-    minWidth: "80px", // sesuai
+    minWidth: "80px",
     textAlign: "left",
     flexShrink: 0,
     whiteSpace: "nowrap",
   },
-  peringkatColon: {
-    marginRight: "6px",
-  },
+  peringkatColon: { marginRight: "6px" },
   peringkatInput: {
     width: "100%",
     border: "none",
@@ -1027,9 +938,7 @@ const styles = {
     flex: 1,
   },
 
-  noteBlock: {
-    marginBottom: "10px",
-  },
+  noteBlock: { marginBottom: "10px" },
   noteBox: {
     width: "100%",
     minHeight: "28px",
@@ -1050,11 +959,7 @@ const styles = {
     marginBottom: "10px",
     fontSize: "13.5px",
   },
-  dateLine: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: "2px",
-  },
+  dateLine: { display: "flex", alignItems: "baseline", gap: "2px" },
   dateInput: {
     border: "none",
     borderBottom: "1px dotted #999",
@@ -1089,17 +994,9 @@ const styles = {
     justifyContent: "flex-start",
     lineHeight: "20px",
   },
-  signHeader: {
-    fontWeight: 600,
-  },
-  signRole: {
-    marginTop: "0px",
-  },
-  signSpace: {
-    height: "36px",
-    flexShrink: 0,
-    width: "100%",
-  },
+  signHeader: { fontWeight: 600 },
+  signRole: { marginTop: "0px" },
+  signSpace: { height: "36px", flexShrink: 0, width: "100%" },
   signInput: {
     border: "none",
     borderTop: "1px solid #1a1a1a",
@@ -1115,7 +1012,6 @@ const styles = {
   },
 };
 
-// ============ PRINT STYLES ============
 const printStyles = `
   @media screen {
     .paper-wrapper { display: none; }
@@ -1124,72 +1020,22 @@ const printStyles = `
   @media print {
     html, body { margin: 0; padding: 0; }
     .no-print { display: none !important; }
-    .page-wrapper-root {
-      padding: 0 !important;
-      min-height: 0 !important;
-      background: none !important;
-    }
-    .paper-wrapper {
-      display: block !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      page-break-after: always;
-      break-after: page;
-    }
-    .paper-wrapper:last-child {
-      page-break-after: auto;
-      break-after: auto;
-    }
-    .paper-scale-outer {
-      height: auto !important;
-      display: block !important;
-    }
-    .paper-scale-inner {
-      transform: none !important;
-    }
-    .paper {
-      box-shadow: none !important;
-      margin: 0 !important;
-      width: 210mm !important;
-      min-height: 297mm !important;
-      padding: 11mm 16mm !important;  
-      box-sizing: border-box !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-    * {
-      box-sizing: border-box !important;
-    }
+    .page-wrapper-root { padding: 0 !important; min-height: 0 !important; background: none !important; }
+    .paper-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; page-break-after: always; break-after: page; }
+    .paper-wrapper:last-child { page-break-after: auto; break-after: auto; }
+    .paper-scale-outer { height: auto !important; display: block !important; }
+    .paper-scale-inner { transform: none !important; }
+    .paper { box-shadow: none !important; margin: 0 !important; width: 210mm !important; min-height: 297mm !important; padding: 11mm 16mm !important; box-sizing: border-box !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    * { box-sizing: border-box !important; }
     @page { size: A4; margin: 0; }
-    input::placeholder, textarea::placeholder {
-      color: transparent !important;
-    }
+    input::placeholder, textarea::placeholder { color: transparent !important; }
   }
-  input, textarea {
-    font-family: 'Times New Roman', Times, serif;
-    box-sizing: border-box;
-  }
-  input::placeholder, textarea::placeholder {
-    color: #b0b0b0;
-    font-style: italic;
-  }
-
-  /* ===== RESPONSIVE TOOLBAR (mobile web) ===== */
+  input, textarea { font-family: 'Times New Roman', Times, serif; box-sizing: border-box; }
+  input::placeholder, textarea::placeholder { color: #b0b0b0; font-style: italic; }
   @media screen and (max-width: 640px) {
-    .toolbar-header {
-      flex-direction: column;
-      align-items: stretch !important;
-      gap: 10px !important;
-    }
-    .btn-print {
-      width: 100%;
-      text-align: center;
-    }
-    .quick-actions {
-      justify-content: flex-start !important;
-    }
-    .more-wrapper {
-      margin-left: 0 !important;
-    }
+    .toolbar-header { flex-direction: column; align-items: stretch !important; gap: 10px !important; }
+    .btn-print { width: 100%; text-align: center; }
+    .quick-actions { justify-content: flex-start !important; }
+    .more-wrapper { margin-left: 0 !important; }
   }
 `;
